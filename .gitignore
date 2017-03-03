@@ -3,3 +3,8 @@
 ################################################################################
 
 /.vs/SentimentTester/v14/.suo
+/SentimentTester/bin/Debug
+/SentimentTester/obj/Debug
+/SentimentTester/backup.txt
+/SentimentTester/db.config
+/packages

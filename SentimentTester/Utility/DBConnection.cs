@@ -49,5 +49,15 @@ namespace SentimentTester
         {
             connection.Close();
         }
+
+        public static void PerformInsert(DBConnection connection, string query)
+        {
+            if (connection.IsConnect())
+            {
+                var cmd = new MySqlCommand(query, connection.Connection);
+                var reader = cmd.ExecuteReader();
+                reader.Close();
+            }
+        }
     }
 }

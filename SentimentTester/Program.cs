@@ -33,8 +33,6 @@ namespace SentimentTester
             List<string> statementTexts = new List<string>();
             List<Statement> statementMeta = new List<Statement>();
 
-            Console.ReadLine();
-
             if (connection.IsConnect() && shouldMakeRequest)
             {
                 MySqlCommand cmd = connection.Connection.CreateCommand();
@@ -57,13 +55,13 @@ namespace SentimentTester
                 {
                     Sentiment sent = new JavaScriptSerializer().Deserialize<Sentiment>(MakeRequest(s.content));
                     s.sentiment = sent;
-                    PrintSentiment(sent);
+                    Sentiment.PrintSentiment(sent);
                 }
             }
             
             if (connection.IsConnect() && shouldImportSentiments)
                 foreach(var s in statementMeta)
-                    PerformInsert(
+                    DBConnection.PerformInsert(
                         connection, 
                         String.Format(
                             "INSERT INTO sentiment (label, statementID, pos, neg, neutral) VALUES('{0}', '{1}', '{2}', '{3}', '{4}')", 
@@ -79,7 +77,7 @@ namespace SentimentTester
             if (connection.IsConnect() && shouldImportStatements)
             {
                 foreach (var s in statementTexts)
-                    PerformInsert(
+                    DBConnection.PerformInsert(
                         connection, 
                         String.Format(
                             "INSERT INTO statement (content, date) VALUES('{0}', '{1}')", 
@@ -93,19 +91,7 @@ namespace SentimentTester
             Console.WriteLine("Press Enter to Continue...");
             Console.ReadLine();
         }
-
-        public static void PerformInsert(DBConnection connection, string query)
-        {
-            if(connection.IsConnect())
-            {
-                var cmd = new MySqlCommand(query, connection.Connection);
-                var reader = cmd.ExecuteReader();
-                reader.Close();
-            }
-        }
-
         
-
         public static string MakeRequest(string input)
         {
             string URI = "http://text-processing.com/api/sentiment/";
@@ -118,30 +104,6 @@ namespace SentimentTester
 
                 return HtmlResult;
             }
-        }
-
-        static void PrintSentiment(Sentiment sent)
-        {
-            Console.WriteLine("----------------------------------");
-            //Console.WriteLine(se);
-            Console.WriteLine(sent.label);
-            if (sent.label == "neg")
-                Console.WriteLine(sent.probability.neg);
-            if (sent.label == "pos")
-                Console.WriteLine(sent.probability.pos);
-            if (sent.label == "neutral")
-                Console.WriteLine(sent.probability.neutral);
-            Console.WriteLine("----------------------------------");
-        }
-
-        static double GetProbabilityValue(Sentiment sent)
-        {
-            if (sent.label == "neg")
-                return sent.probability.neg;
-            else if (sent.label == "pos")
-                return sent.probability.pos;
-            else
-                return sent.probability.neutral;
         }
     }
 }
